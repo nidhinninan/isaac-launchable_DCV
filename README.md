@@ -27,19 +27,18 @@ This guide will get you started with a Visual Studio Code instance with Isaac La
 > This project is intended for learning purposes. It is not intended for production use.
 
 > [!NOTE]
-> Please note that Brev instances are pay-by-the hour. To make the best use of credits, stop instances when they are not in use. Stopped instances have a smaller storage charge.
+> Please note that Brev instances are pay-by-the-hour. To make the best use of credits, stop instances when they are not in use. Stopped instances have a smaller storage charge.
 
 ### Deploy
 1. Click this Deploy Now button ->
 [![ Click here to deploy.](https://brev-assets.s3.us-west-1.amazonaws.com/nv-lb-dark.svg)](https://brev.nvidia.com/launchable/deploy/now?launchableID=env-35JP2ywERLgqtD0b0MIeK1HnF46)
 2. In Brev, click the Deploy Launchable button to spin up the instance.
-3. Wait for the instance to be fully ready on Brev: running, built, and the setup script has completed (first launch can take a while)
-4. Open the `Logs` tab to view the setup script output. At the end of this output, a password will be printed. This is the password for the Visual Studio Code server. Save this somewhere safe.
-5. On the Brev instance page, scroll to the TCP/UDP ports section.
-6. Click the link for port 80 (HTTP) to open Visual Studio Code Server.
-7. Enter the password from the Logs tab in step 4.
-8. Inside Visual Studio Code, continue with the [README.md](https://github.com/isaac-sim/isaac-launchable/blob/main/isaac-lab/vscode/README.md) instructions. A summary is provided below.
-9. Now you're in the Visual Studio Code dev environment! 
+3. Wait for the instance to be fully ready on Brev: running, built, and the setup script has completed (the first launch can take a while)
+4. On the Brev instance page, scroll to the "Using Secure Links" section.
+5. Click the arrow icon next to the Shareable URL.
+6. Login with your NVIDIA Brev account.
+7. Inside Visual Studio Code, continue with the [README.md](https://github.com/isaac-sim/isaac-launchable/blob/main/isaac-lab/vscode/README.md) instructions. A summary is provided below.
+8. Now you're in the Visual Studio Code dev environment! 
 
 ### Running Isaac Sim and Isaac Lab - the quick version
 In short, the commands to run Isaac Lab and Isaac Sim are similar to workstation installs, except when you need the UI. Then we add a few arguments for streaming to the normal commands.
@@ -79,9 +78,9 @@ This is essentially the same command you would run for a workstation install of 
 
 2. Once the training script is complete, test the policy behavior by running: 
 ```
-python isaaclab/scripts/reinforcement_learning/skrl/play.py --task=Isaac-Ant-v0 --livestream 2"
+python isaaclab/scripts/reinforcement_learning/skrl/play.py --task=Isaac-Ant-v0 --livestream 2
 ``` 
-This will launch Isaac Sim. Note how we added the `--kit_args` since we'll want to view the behavior using the Isaac Sim viewport.
+This will launch Isaac Sim. Note how we added the `--livestream 2` argument since we'll want to view the behavior using the Isaac Sim viewport.
 
 3. Wait for application to be ready. 
 - Look for a message saying `Simulation App Startup Complete` in the console.
@@ -100,7 +99,7 @@ This will launch Isaac Sim. Note how we added the `--kit_args` since we'll want 
 ### Demos
 If you're new to Isaac Lab, here are some ideas to try:
 - Run the [Showroom Demos](https://isaac-sim.github.io/IsaacLab/main/source/overview/showroom.html) from Isaac Lab.
-- Take the introductory Isaac Lab courses: "Train Your First Robot With Isaac Lab" and "Train your Second Robot With Isaac Lab" available [here](https://www.nvidia.com/en-us/learn/learning-path/robotics/)
+- Take the introductory Isaac Lab courses: "Train Your First Robot With Isaac Lab" and "Train Your Second Robot With Isaac Lab" available [here](https://www.nvidia.com/en-us/learn/learning-path/robotics/)
 - Explore the Isaac Lab [Walkthrough](https://isaac-sim.github.io/IsaacLab/main/source/setup/walkthrough/index.html)
 
 ## Creating Your Own Launchable
@@ -119,28 +118,31 @@ These instructions describe how to create a customized Launchable, similar to th
 6. On the next page, add a setup script. Under the *Paste Script* tab, add this code:
 ```bash
 #!/bin/bash
-export VSCODE_PASSWORD=your_password # replace with a secure password or generate it securely
+# optional: if not using secure links, uncomment the following line and replace with your desired password
+# export VSCODE_PASSWORD=your_password
 git clone https://github.com/isaac-sim/isaac-launchable
 cd isaac-launchable/isaac-lab
 docker compose up -d
 ```
-7. The VSCode container expects a password to be set via the $VSCODE_PASSWORD environment variable. Add the following environment variable to the setup script. Replace `your_password` with your desired password, or generate it securely.
+7. Optional step: You can add a password to the VSCode Container if you like. For our default Launchable, we use the Secure Links feature, which leverages your NVIDIA account for login (see step 10)
+
+The VSCode container looks for a password to be set via the $VSCODE_PASSWORD environment variable. Add the following environment variable to the setup script. Replace `your_password` with your desired password, or generate it securely.
 ```bash
 export VSCODE_PASSWORD=your_password
 ```
 
 8. Click Next.
 9. Under "Do you want a Jupyter Notebook experience" select "No, I don't want Jupyter".
-10. Select the TCP/UDP ports tab.
-11. Expose the following ports (for Visual Studio Code Server and Kit App Streaming) to a specific public IP address that will be using this service.
+10. Select the Secure Link tab, and add a secure link named "isaac" at port 80. 
+11. Select the TCP/UDP ports tab.
+12. Add rules to open the following ports for streaming:
 ```
-80
 1024
 47998
 49100
 ```
-12. Click Next.
-13. Choose your desired compute.
+13. Click Next.
+14. Choose your desired compute.
 
 > [!NOTE]
 > GPUs with RT cores are required for Kit App Streaming. 
@@ -148,8 +150,8 @@ export VSCODE_PASSWORD=your_password
 
 > [!IMPORTANT]
 > The project is not currently compatible with Crusoe instances. AWS has been tested and is used for the example launchable.
-14. Choose disk storage, then click Next.
-15. Enter a name, then select **Create Launchable**
+15. Choose disk storage, then click Next.
+16. Enter a name, then select **Create Launchable**
 
 Congratulations! You now have a custom launchable.
 
@@ -159,10 +161,10 @@ This project can also be used to run a containerized version of Isaac Sim and Is
 
 To use this project locally, you'll need a workstation that meets [Isaac Sim](https://docs.isaacsim.omniverse.nvidia.com/latest/installation/requirements.html)'s requirements.
 
-1. Install the NVIDIA Container Toolkit: `sudo install nvidia-container-toolkit`
+1. Install the NVIDIA Container Toolkit: `sudo apt install nvidia-container-toolkit`
 2. Inside [this docker-compose file](https://github.com/isaac-sim/isaac-launchable/blob/main/isaac-lab/docker-compose.yml), change the `ENV=brev` line to `ENV=localhost`.
 3. Inside the folder `isaac-lab`, run `docker compose up -d`.
-4. Access the VSCode instance via `localhost`.
+4. Access the VSCode instance at `localhost` in a browser.
 
 ## Troubleshooting
 If you run into issues or can't make the web viewer connect, the first thing to check is that all containers are running.

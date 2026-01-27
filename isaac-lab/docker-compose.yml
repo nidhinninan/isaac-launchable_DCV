@@ -35,8 +35,8 @@ services:
       - PUID=0
       - PGID=0
       - TZ=Etc/UTC
-      - PASSWORD=$VSCODE_PASSWORD #optional
-      - SUDO_PASSWORD=$VSCODE_PASSWORD #optional
+      - PASSWORD=${VSCODE_PASSWORD:-}
+      - SUDO_PASSWORD=${VSCODE_PASSWORD:-}
       - DEFAULT_WORKSPACE=/config/workspace
       - KUBECONFIG=/kube/config
     restart: unless-stopped
